@@ -505,12 +505,24 @@ namespace argos {
       if(nTimerId != -1) killTimer(nTimerId);
       nTimerId = -1;
    }
+   /****************************************/
+   /****************************************/
+
+   static Real TVTimeToHumanReadable(::timeval& t_time) {
+      return
+         static_cast<Real>(t_time.tv_sec) +
+         static_cast<Real>(t_time.tv_usec * 10e-6);
+   }
 
    /****************************************/
    /****************************************/
 
    void CQTOpenGLWidget::StepExperiment() {
       if(!m_cSimulator.IsExperimentFinished()) {
+         /* Initialize m_tStepClockTime */
+         timerclear(&m_tStepClockTime);
+         m_tStepClockTime.tv_usec = 1e6 * CPhysicsEngine::GetSimulationClockTick();
+         
          m_cSimulator.UpdateSpace();
          if(m_bFastForwarding) {
             /* Frame dropping happens only in fast-forward */
@@ -522,6 +534,18 @@ namespace argos {
          } else {
             update();
          }
+         /* Calculate the elapsed time */
+         ::gettimeofday(&m_tStepEndTime, NULL);
+         timersub(&m_tStepEndTime, &m_tStepStartTime, &m_tStepElapsedTime);
+         /* Calculate and display the RealTimeFactor */
+         LOG << "[INFO] RealTimeFactor: "
+             << TVTimeToHumanReadable(m_tStepClockTime) /
+                TVTimeToHumanReadable(m_tStepElapsedTime)
+             << std::endl;
+         /* Set the step start time to whatever the step end time is */
+         m_tStepStartTime.tv_sec = m_tStepEndTime.tv_sec;
+         m_tStepStartTime.tv_usec = m_tStepEndTime.tv_usec;
+         /* Notify step is done */
          emit StepDone(m_cSpace.GetSimulationClock());
       }
       else {

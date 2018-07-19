@@ -70,6 +70,11 @@ namespace argos {
       ::gettimeofday(&m_tStepEndTime, NULL);
       /* Calculate the elapsed time */
       timersub(&m_tStepEndTime, &m_tStepStartTime, &m_tStepElapsedTime);
+      /* Log the RealTimeFactor */
+      LOG << "[INFO] RealTimeFactor: "
+          << TVTimeToHumanReadable(m_tStepClockTime) /
+             TVTimeToHumanReadable(m_tStepElapsedTime)
+          << std::endl;
       /* If the elapsed time is lower than the tick length, wait */
       if(!timercmp(&m_tStepElapsedTime, &m_tStepClockTime, >)) {
          /* Calculate the waiting time */

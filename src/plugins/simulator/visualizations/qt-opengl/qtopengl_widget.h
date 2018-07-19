@@ -25,6 +25,7 @@ namespace argos {
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
 #include <QOpenGLTexture>
+#include <sys/time.h>
 
 #ifdef __APPLE__
 #include <glu.h>
@@ -349,6 +350,17 @@ namespace argos {
       SInt32 m_nDrawFrameEvery;
       /** Counter for the current frame */
       SInt32 m_nFrameCounter;
+
+      /** The length of a clock tick */
+      ::timeval m_tStepClockTime;
+      /** The starting time of a clock tick */
+      ::timeval m_tStepStartTime;
+      /** The end time of a clock tick */
+      ::timeval m_tStepEndTime;
+      /** The elapsed time between start and end of a clock tick */
+      ::timeval m_tStepElapsedTime;
+      /** The time to wait to complete a clock tick */
+      ::timeval m_tStepWaitTime;
 
       /** True when the mouse is grabbed by this widget */
       bool m_bMouseGrabbed;
